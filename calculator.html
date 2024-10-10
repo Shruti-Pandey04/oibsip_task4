@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #F1E8B8; /* Light blue background */
+            font-family: 'Arial', sans-serif;
+            position: relative;
+        }
+
+        #date-time {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            color: #000; /* Black text */
+            font-size: 14px;
+            position: absolute;
+            top: 0;
+        }
+
+        .greeting {
+            text-align: center;
+            margin-top: 60px; /* Add margin to position below date/time */
+            font-size: 20px;
+            color: #320E3B; /* Dark text */
+            display: none;
+        }
+
+        .calculator {
+            background: #320E3B; /* Dark purple background */
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            width: 350px;
+            margin-top: 20px;
+        }
+
+        #display, #preview {
+            width: 100%;
+            font-size: 24px;
+            border: none;
+            background: #C6DFE7; /* Light blue-gray for display and preview */
+            border-radius: 10px;
+            padding: 10px;
+            text-align: right;
+            margin-bottom: 10px;
+            color: #320E3B; /* Dark text for contrast */
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            height: 60px;
+            font-size: 20px; /* Adjusted font size */
+            border: none;
+            border-radius: 10px;
+            background: #6C6F88; /* Grayish-blue buttons */
+            color: #ffffff;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        button:hover {
+            background: #858998; /* Lighter color on hover */
+        }
+
+        button:active {
+            transform: scale(0.95); /* Slightly shrink on click */
+        }
+
+        .reset-button, .theme-button {
+            font-size: 16px; /* Smaller font size for RESET and THEME buttons */
+        }
+
+        .theme-button {
+            width: 100%; /* Full width for centering */
+            height: 40px; /* Rectangle shape */
+            background: #6C6F88;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        #battery {
+            text-align: center;
+            font-size: 18px;
+            color: #320E3B;
+            margin-top: 10px; /* Space before battery display */
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        #username-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            display: none;
+        }
+
+        .popup-content {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .popup-content input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 80%;
+            margin-bottom: 10px;
+        }
+
+        .popup-content button {
+            padding: 10px 20px;
+            background: ##327489; /* Updated submit button color */
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .popup-content button:hover {
+            background: #B7D6E4; /* Slightly darker on hover */
+        }
+    </style>
+</head>
+<body>
+    <div id="date-time">
+        <span id="current-date"></span>
+        <span id="current-time"></span>
+    </div>
+    <div class="greeting" id="greeting"></div>
+    <div class="calculator">
+        <input type="text" id="display" disabled />
+        <input type="text" id="preview" disabled />
+        <div class="buttons">
+            <button class="reset-button" onclick="clearDisplay()">RESET</button>
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button onclick="appendToDisplay('/')">/</button>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button onclick="appendToDisplay('+')">+</button>
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button onclick="appendToDisplay('-')">-</button>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="calculateResult()">=</button>
+            <button onclick="appendToDisplay('*')">x</button>
+        </div>
+        <button class="theme-button" onclick="toggleTheme()">Change Theme</button>
+    </div>
+    <div id="battery">Battery: <span id="battery-percentage">0%</span></div>
+    <div id="username-popup">
+        <div class="popup-content">
+            <h2 style="color: #320E3B;">Enter your username:</h2>
+            <input type="text" id="username" placeholder="Username" />
+            <button onclick="setUsername()">Submit</button>
+        </div>
+    </div>
+    <script>
+        function appendToDisplay(value) {
+            const display = document.getElementById('display');
+            const preview = document.getElementById('preview');
+            display.value += value;
+            preview.value += value + ' '; // Add to history
+        }
+
+        function clearDisplay() {
+            document.getElementById('display').value = '';
+            document.getElementById('preview').value = ''; // Clear preview data
+        }
+
+        function calculateResult() {
+            const display = document.getElementById('display');
+            try {
+                const result = eval(display.value.replace(/x/g, '*'));
+                display.value = result;
+            } catch (error) {
+                display.value = 'Error';
+                setTimeout(clearDisplay, 1500);
+            }
+        }
+
+        function showDateTime() {
+            const now = new Date();
+            document.getElementById('current-date').innerText = now.toLocaleDateString();
+            document.getElementById('current-time').innerText = now.toLocaleTimeString();
+            setTimeout(showDateTime, 1000);
+        }
+
+        function setUsername() {
+            const username = document.getElementById('username').value;
+            if (username) {
+                document.getElementById('greeting').innerText = `Welcome, ${username}!`;
+                document.getElementById('username-popup').style.display = 'none';
+                document.getElementById('greeting').style.display = 'block';
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const calculator = document.querySelector('.calculator');
+            const buttons = document.querySelectorAll('button');
+            
+            // Toggle theme colors
+            body.style.backgroundColor = body.style.backgroundColor === 'rgb(166, 207, 213)' ? '#F1E8B8' : '#A6CFD5'; // Change main background
+            calculator.style.backgroundColor = calculator.style.backgroundColor === 'rgb(199, 153, 183)' ? '#320E3B' : '#501537'; // Change calculator background
+            buttons.forEach(button => {
+                button.style.backgroundColor = button.style.backgroundColor === 'rgb(108, 111, 136)' ? '#6C6F88' : '#C699B7'; // Change button colors
+            });
+        }
+
+        function updateBatteryStatus() {
+		navigator.getBattery().then(function(battery) {
+        const batteryPercentage = Math.round(battery.level * 100);
+        document.getElementById('battery-percentage').innerText = `${batteryPercentage}%`;
+        battery.onchargingchange = updateBatteryStatus; // Update on charging change
+        battery.onlevelchange = updateBatteryStatus; // Update on level change
+    });
+}
+
+        // Initialize date/time display and battery status
+        showDateTime();
+        updateBatteryStatus();
+
+        // Show the username input popup when the page loads
+        window.onload = function() {
+            document.getElementById('username-popup').style.display = 'flex';
+        };
+    </script>
+</body>
+</html>

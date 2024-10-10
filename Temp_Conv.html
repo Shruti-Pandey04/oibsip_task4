@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Converter</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #D9FFF8; /* Set main background color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            transition: background-color 0.5s ease; /* Smooth transition for background color */
+        }
+
+        .container {
+            background: #FAD1B6; /* Set container background color */
+            border-radius: 15px;
+            padding: 40px 30px;
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+            width: 350px;
+            text-align: center;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 18px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 26px;
+            color: #333;
+            margin-bottom: 10px;
+            animation: slideIn 1s ease-out;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 25px;
+            opacity: 0;
+            animation: fadeIn 1s ease-in forwards;
+            animation-delay: 0.5s;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeIn 1s ease-in forwards;
+            animation-delay: 0.8s;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            margin-top: 5px;
+            transition: border 0.3s ease;
+            background-color: #f7f7f7;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #667eea;
+        }
+
+        .buttons {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            opacity: 0;
+            animation: fadeIn 1s ease-in forwards;
+            animation-delay: 1s;
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: #3498db;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+        }
+
+        button.reset {
+            background-color: #e74c3c;
+        }
+
+        button.reset:hover {
+            background-color: #c0392b;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .animated-border {
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #3498db, #8e44ad);
+            background-size: 200%;
+            animation: animateBorder 2s linear infinite;
+        }
+
+        @keyframes animateBorder {
+            0% {
+                background-position: 0%;
+            }
+            100% {
+                background-position: 200%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Temperature Converter</h1>
+        <h2>Convert between Celsius, Fahrenheit, and Kelvin</h2>
+
+        <div class="input-section">
+            <input type="number" id="inputValue" placeholder="Enter value" oninput="updateBackgroundColor()">
+            <select id="inputUnit" onchange="updateDropdowns()">
+                <option value="Celsius">Celsius</option>
+                <option value="Fahrenheit">Fahrenheit</option>
+                <option value="Kelvin">Kelvin</option>
+            </select>
+        </div>
+
+        <div class="input-section">
+            <input type="text" id="outputValue" placeholder="Converted value" readonly>
+            <select id="outputUnit" onchange="updateDropdowns()"></select>
+        </div>
+
+        <div class="input-section">
+            <input type="text" id="thirdValue" placeholder="Remaining value" readonly>
+            <select id="thirdUnit" disabled></select>
+        </div>
+
+        <div class="buttons">
+            <button onclick="convertTemperature()">CONVERT</button>
+            <button class="reset" onclick="resetFields()">RESET</button>
+        </div>
+        <div class="animated-border"></div>
+    </div>
+
+    <script>
+        const units = ["Celsius", "Fahrenheit", "Kelvin"];
+
+        function updateDropdowns() {
+            const inputUnit = document.getElementById("inputUnit").value;
+            const outputUnit = document.getElementById("outputUnit");
+            const thirdUnit = document.getElementById("thirdUnit");
+
+            const outputOptions = units.filter(unit => unit !== inputUnit);
+            outputUnit.innerHTML = outputOptions.map(unit => `<option value="${unit}">${unit}</option>`).join("");
+
+            const selectedOutputUnit = outputUnit.value;
+            const thirdOptions = outputOptions.filter(unit => unit !== selectedOutputUnit);
+            thirdUnit.innerHTML = thirdOptions.map(unit => `<option value="${unit}">${unit}</option>`).join("");
+
+            thirdUnit.disabled = !selectedOutputUnit;
+        }
+
+        function updateBackgroundColor() {
+            const inputValue = parseFloat(document.getElementById("inputValue").value);
+            const inputUnit = document.getElementById("inputUnit").value;
+
+            if (isNaN(inputValue)) return; // Do not change color if input is not a number
+
+            let celsiusValue = inputUnit === "Celsius" ? inputValue :
+                inputUnit === "Fahrenheit" ? (inputValue - 32) * 5 / 9 :
+                inputValue - 273.15;
+
+            let newColor;
+
+            if (celsiusValue < 0) {
+                newColor = '#00f'; // Blue for cold temperatures
+            } else if (celsiusValue >= 0 && celsiusValue <= 30) {
+                newColor = '#66f'; // Light blue for mild temperatures
+            } else if (celsiusValue > 30 && celsiusValue <= 60) {
+                newColor = '#ffcc00'; // Yellow for warm temperatures
+            } else {
+                newColor = '#f00'; // Red for hot temperatures
+            }
+
+            document.body.style.backgroundColor = newColor;
+        }
+
+        function convertTemperature() {
+            const inputValue = parseFloat(document.getElementById("inputValue").value);
+            const inputUnit = document.getElementById("inputUnit").value;
+            const outputUnit = document.getElementById("outputUnit").value;
+            const thirdUnit = document.getElementById("thirdUnit").value;
+
+            if (isNaN(inputValue)) {
+                alert("Please enter a valid number");
+                return;
+            }
+
+            let celsiusValue = inputUnit === "Celsius" ? inputValue :
+                inputUnit === "Fahrenheit" ? (inputValue - 32) * 5 / 9 :
+                inputValue - 273.15;
+
+            const convertedValue = outputUnit === "Celsius" ? celsiusValue :
+                outputUnit === "Fahrenheit" ? (celsiusValue * 9 / 5) + 32 :
+                celsiusValue + 273.15;
+
+            const thirdConvertedValue = thirdUnit === "Celsius" ? celsiusValue :
+                thirdUnit === "Fahrenheit" ? (celsiusValue * 9 / 5) + 32 :
+                celsiusValue + 273.15;
+
+            document.getElementById("outputValue").value = convertedValue.toFixed(2);
+            document.getElementById("thirdValue").value = thirdConvertedValue.toFixed(2);
+
+            // Update background color based on Celsius value
+            updateBackgroundColor();
+        }
+
+        function resetFields() {
+            document.getElementById("inputValue").value = '';
+            document.getElementById("outputValue").value = '';
+            document.getElementById("thirdValue").value = '';
+            document.getElementById("inputUnit").value = 'Celsius';
+            document.body.style.backgroundColor = '#D9FFF8'; // Reset background color
+            updateDropdowns();
+        }
+
+        // Initialize dropdowns on page load
+        updateDropdowns();
+    </script>
+</body>
+</html>

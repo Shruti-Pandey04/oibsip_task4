@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Register</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #9face6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(-30px);
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .input-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        input {
+            width: 80%;
+            padding: 10px 10px 10px 40px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .material-icons {
+            position: absolute;
+            left: 10px;
+            top: 12px;
+            color: #aaa;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #message {
+            margin-top: 20px;
+            color: red;
+        }
+
+        #login-form {
+            display: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .switch-button {
+            margin-top: 10px;
+            background: none;
+            color: #3498db;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: underline;
+        }
+
+        .switch-button:hover {
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Register</h2>
+        <form id="register-form">
+            <div class="input-container">
+                <span class="material-icons">person</span>
+                <input type="text" id="register-username" name="username" placeholder="Username" required>
+            </div>
+            <div class="input-container">
+                <span class="material-icons">lock</span>
+                <input type="password" id="register-password" name="password" placeholder="Password" required>
+            </div>
+            <button type="button" onclick="register()">Register</button>
+            <button type="button" class="switch-button" onclick="showLoginForm()">Already registered? Login here</button>
+        </form>
+
+        <h2 id="login-title" class="hidden">Login</h2>
+        <form id="login-form">
+            <div class="input-container">
+                <span class="material-icons">person</span>
+                <input type="text" id="login-username" name="username" placeholder="Username" required>
+            </div>
+            <div class="input-container">
+                <span class="material-icons">lock</span>
+                <input type="password" id="login-password" name="password" placeholder="Password" required>
+            </div>
+            <button type="button" onclick="login()">Login</button>
+        </form>
+
+        <div id="message"></div>
+    </div>
+
+    <script>
+        function register() {
+            const username = document.getElementById("register-username").value;
+            const password = document.getElementById("register-password").value;
+
+            if (username && password) {
+                if (localStorage.getItem(username)) {
+                    document.getElementById("message").innerText = "Username already exists!";
+                } else {
+                    localStorage.setItem(username, password);
+                    document.getElementById("message").innerText = `Registration successful for ${username}!`;
+                    document.getElementById("message").style.color = "green";
+                    document.getElementById("register-form").style.display = "none";
+                    document.getElementById("login-title").classList.remove("hidden");
+                    document.getElementById("login-form").style.display = "block";
+                }
+            } else {
+                document.getElementById("message").innerText = "Please fill out all fields.";
+            }
+        }
+
+        function login() {
+            const username = document.getElementById("login-username").value;
+            const password = document.getElementById("login-password").value;
+
+            if (localStorage.getItem(username)) {
+                if (localStorage.getItem(username) === password) {
+                    document.getElementById("message").innerText = "Login successful!";
+                    document.getElementById("message").style.color = "green";
+
+                    setTimeout(() => {
+                        window.location.href = "main.html";
+                    }, 1000);
+                } else {
+                    document.getElementById("message").innerText = "Invalid password!";
+                }
+            } else {
+                document.getElementById("message").innerText = "User does not exist!";
+            }
+        }
+
+        function showLoginForm() {
+            document.getElementById("register-form").style.display = "none";
+            document.getElementById("login-title").classList.remove("hidden");
+            document.getElementById("login-form").style.display = "block";
+        }
+    </script>
+</body>
+</html>
